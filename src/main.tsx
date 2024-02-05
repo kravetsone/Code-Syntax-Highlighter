@@ -1,7 +1,7 @@
 /** @jsx figma.widget.h */
 
 import { once, showUI } from "@create-figma-plugin/utilities";
-import { TokensResult } from "shiki/types.mjs";
+import { BundledLanguage, BundledTheme, TokensResult } from "shiki/types.mjs";
 import { InsertCodeHandler } from "./types";
 
 const { widget } = figma;
@@ -17,19 +17,32 @@ function Notepad() {
 		tokens: [],
 	});
 	const [text, setText] = useSyncedState("text", "");
+	const [language, setLanguage] = useSyncedState<BundledLanguage>(
+		"language",
+		"typescript",
+	);
+	const [theme, setTheme] = useSyncedState<BundledTheme>(
+		"theme",
+		"vitesse-dark",
+	);
 
 	async function onChange({
 		propertyName,
 	}: WidgetPropertyEvent): Promise<void> {
 		await new Promise<void>((resolve: () => void): void => {
 			if (propertyName === "edit") {
-				showUI({ height: 500, width: 500 }, { text: text });
-				once<InsertCodeHandler>("UPDATE_CODE", (tokens, text) => {
-					setTokens(tokens);
-					setText(text);
+				showUI({ height: 500, width: 500 }, { text, theme, language });
+				once<InsertCodeHandler>(
+					"UPDATE_CODE",
+					(tokens, text, theme, language) => {
+						setTokens(tokens);
+						setText(text);
+						setTheme(theme);
+						setLanguage(language);
 
-					resolve();
-				});
+						resolve();
+					},
+				);
 			}
 		});
 	}
