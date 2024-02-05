@@ -8,27 +8,26 @@ const { widget } = figma;
 const { AutoLayout, Text, Span, useSyncedState, usePropertyMenu, Frame } =
 	widget;
 
-const FONT_SIZE = 24;
-const LETTER_WIDTH = FONT_SIZE * 0.6;
-const LETTER_HEIGHT = (FONT_SIZE / 24) * 30;
-
 export default function () {
 	widget.register(Notepad);
 }
 
 function Notepad() {
-	const [tokens, setTokens] = useSyncedState<TokensResult>("text", {
+	const [tokens, setTokens] = useSyncedState<TokensResult>("tokens", {
 		tokens: [],
 	});
+	const [text, setText] = useSyncedState("text", "");
 
 	async function onChange({
 		propertyName,
 	}: WidgetPropertyEvent): Promise<void> {
 		await new Promise<void>((resolve: () => void): void => {
 			if (propertyName === "edit") {
-				showUI({ height: 500, width: 500 }, { text: tokens });
-				once<InsertCodeHandler>("UPDATE_CODE", (tokens) => {
+				showUI({ height: 500, width: 500 }, { text: text });
+				once<InsertCodeHandler>("UPDATE_CODE", (tokens, text) => {
 					setTokens(tokens);
+					setText(text);
+
 					resolve();
 				});
 			}

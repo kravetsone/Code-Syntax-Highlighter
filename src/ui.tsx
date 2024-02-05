@@ -14,13 +14,13 @@ import { InsertCodeHandler } from "./types";
 
 function Plugin(props: { text: string }) {
 	console.log(props.text);
-	const [text, setText] = useState("");
+	const [text, setText] = useState(props.text);
 	const handleUpdateButtonClick = useCallback(async () => {
 		const tokens = await codeToTokens(text, {
 			lang: "javascript",
 			theme: "vitesse-dark",
 		});
-		emit<InsertCodeHandler>("UPDATE_CODE", tokens);
+		emit<InsertCodeHandler>("UPDATE_CODE", tokens, text);
 		console.log(tokens);
 	}, [text]);
 

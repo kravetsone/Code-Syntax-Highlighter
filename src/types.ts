@@ -3,5 +3,5 @@ import { TokensResult } from "shiki/types.mjs";
 
 export interface InsertCodeHandler extends EventHandler {
 	name: "UPDATE_CODE";
-	handler: (code: TokensResult) => void;
+	handler: (code: TokensResult, text: string) => void;
 }
