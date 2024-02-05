@@ -9,12 +9,21 @@ import {
 import { emit } from "@create-figma-plugin/utilities";
 import { h } from "preact";
 import { useCallback, useState } from "preact/hooks";
+import { codeToTokens } from "shiki";
+import { InsertCodeHandler } from "./types";
 
 function Plugin(props: { text: string }) {
-	const [text, setText] = useState(props.text);
-	const handleUpdateButtonClick = useCallback(() => {
-		emit("UPDATE_TEXT", text);
+	console.log(props.text);
+	const [text, setText] = useState("");
+	const handleUpdateButtonClick = useCallback(async () => {
+		const tokens = await codeToTokens(text, {
+			lang: "javascript",
+			theme: "vitesse-dark",
+		});
+		emit<InsertCodeHandler>("UPDATE_CODE", tokens);
+		console.log(tokens);
 	}, [text]);
+
 	return (
 		<Container space="medium">
 			<VerticalSpace space="large" />
@@ -24,6 +33,8 @@ function Plugin(props: { text: string }) {
 				value={text}
 				variant="border"
 			/>
+			{/* biome-ignore lint/security/noDangerouslySetInnerHtml: <explanation> */}
+			<div dangerouslySetInnerHTML={{ __html: text }} />
 			<VerticalSpace space="large" />
 			<Button fullWidth onClick={handleUpdateButtonClick}>
 				Update Text

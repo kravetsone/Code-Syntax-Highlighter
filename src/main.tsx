@@ -1,67 +1,59 @@
 /** @jsx figma.widget.h */
 
 import { once, showUI } from "@create-figma-plugin/utilities";
+import { TokensResult } from "shiki/types.mjs";
+import { InsertCodeHandler } from "./types";
 
 const { widget } = figma;
-const { AutoLayout, Text, useSyncedState, usePropertyMenu } = widget;
+const { AutoLayout, Text, useSyncedState, usePropertyMenu, Frame } = widget;
 
 export default function () {
 	widget.register(Notepad);
 }
 
 function Notepad() {
-	const [text, setText] = useSyncedState("text", "Hello\nWidgets");
-	const items: Array<WidgetPropertyMenuItem> = [
-		{
-			itemType: "action",
-			propertyName: "edit",
-			tooltip: "Edit",
-		},
-	];
+	const [tokens, setTokens] = useSyncedState<TokensResult>("text", {
+		tokens: [],
+	});
+
 	async function onChange({
 		propertyName,
 	}: WidgetPropertyEvent): Promise<void> {
 		await new Promise<void>((resolve: () => void): void => {
 			if (propertyName === "edit") {
-				showUI({ height: 144, width: 240 }, { text });
-				once("UPDATE_TEXT", (text: string): void => {
-					setText(text);
+				showUI({ height: 500, width: 500 }, { text: tokens });
+				once<InsertCodeHandler>("UPDATE_CODE", (tokens) => {
+					setTokens(tokens);
 					resolve();
 				});
 			}
 		});
 	}
-	usePropertyMenu(items, onChange);
+	usePropertyMenu(
+		[
+			{
+				itemType: "action",
+				propertyName: "edit",
+				tooltip: "Edit",
+			},
+		],
+		onChange,
+	);
+	console.log("client", tokens);
 	return (
-		<AutoLayout
-			direction="horizontal"
-			effect={{
-				blur: 2,
-				color: { a: 0.2, b: 0, g: 0, r: 0 },
-				offset: { x: 0, y: 0 },
-				spread: 2,
-				type: "drop-shadow",
-			}}
-			fill="#FFFFFF"
-			height="hug-contents"
-			horizontalAlignItems="center"
-			padding={8}
-			spacing={12}
-			verticalAlignItems="center"
-		>
-			<AutoLayout
-				direction="vertical"
-				horizontalAlignItems="start"
-				verticalAlignItems="start"
-			>
-				{text.split("\n").map((line) => {
-					return line ? (
-						<Text fontSize={12} horizontalAlignText="left" width="fill-parent">
-							{line}
-						</Text>
-					) : null;
-				})}
-			</AutoLayout>
-		</AutoLayout>
+		<Frame width={500} height={500}>
+			{tokens.tokens.flatMap((row) =>
+				row.map((token, index) => (
+					<Text
+						key={token.offset}
+						fontSize={12}
+						fill={token.color}
+						x={token.offset}
+					>
+						{token.content}
+					</Text>
+				)),
+			)}
+		</Frame>
 	);
 }
