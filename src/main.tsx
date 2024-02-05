@@ -5,7 +5,12 @@ import { TokensResult } from "shiki/types.mjs";
 import { InsertCodeHandler } from "./types";
 
 const { widget } = figma;
-const { AutoLayout, Text, useSyncedState, usePropertyMenu, Frame } = widget;
+const { AutoLayout, Text, Span, useSyncedState, usePropertyMenu, Frame } =
+	widget;
+
+const FONT_SIZE = 24;
+const LETTER_WIDTH = FONT_SIZE * 0.6;
+const LETTER_HEIGHT = (FONT_SIZE / 24) * 30;
 
 export default function () {
 	widget.register(Notepad);
@@ -40,20 +45,16 @@ function Notepad() {
 		onChange,
 	);
 	console.log("client", tokens);
+
 	return (
-		<Frame width={500} height={500}>
-			{tokens.tokens.flatMap((row) =>
-				row.map((token, index) => (
-					<Text
-						key={token.offset}
-						fontSize={12}
-						fill={token.color}
-						x={token.offset}
-					>
-						{token.content}
-					</Text>
-				)),
-			)}
-		</Frame>
+		<AutoLayout direction="vertical">
+			{tokens.tokens.map((row) => (
+				<Text fontSize={12}>
+					{row.map((token) => (
+						<Span fill={token.color}>{token.content}</Span>
+					))}
+				</Text>
+			))}
+		</AutoLayout>
 	);
 }
