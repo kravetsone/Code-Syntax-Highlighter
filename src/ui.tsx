@@ -9,14 +9,13 @@ import {
 } from "@create-figma-plugin/ui";
 import { emit } from "@create-figma-plugin/utilities";
 import { h } from "preact";
-import { useCallback, useEffect, useState } from "preact/hooks";
+import { useCallback, useState } from "preact/hooks";
 import {
 	BundledLanguage,
 	BundledTheme,
 	bundledLanguages,
 	bundledThemes,
 	codeToTokens,
-	getHighlighter,
 } from "shiki";
 import { InsertCodeHandler } from "./types";
 

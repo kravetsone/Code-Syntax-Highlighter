@@ -9,10 +9,10 @@ const { AutoLayout, Text, Span, useSyncedState, usePropertyMenu, Frame } =
 	widget;
 
 export default function () {
-	widget.register(Notepad);
+	widget.register(SyntaxHighlighter);
 }
 
-function Notepad() {
+function SyntaxHighlighter() {
 	const [tokens, setTokens] = useSyncedState<TokensResult>("tokens", {
 		tokens: [],
 	});
@@ -29,7 +29,7 @@ function Notepad() {
 	async function onChange({
 		propertyName,
 	}: WidgetPropertyEvent): Promise<void> {
-		await new Promise<void>((resolve: () => void): void => {
+		await new Promise<void>((resolve) => {
 			if (propertyName === "edit") {
 				showUI({ height: 500, width: 500 }, { text, theme, language });
 				once<InsertCodeHandler>(
@@ -56,7 +56,6 @@ function Notepad() {
 		],
 		onChange,
 	);
-	console.log("client", tokens);
 
 	return (
 		<AutoLayout direction="vertical">
